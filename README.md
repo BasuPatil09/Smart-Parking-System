@@ -1,61 +1,56 @@
 # Smart Parking System
 
-> YOLOv8-OBB powered parking occupancy detection with a FastAPI backend and React dashboard.
+> YOLOv8-OBB powered parking occupancy detection — full-stack, production-ready.
 
-Smart Parking System is a full-stack computer vision project that detects parking spaces from parking-lot images and classifies each detected space as **available** or **occupied**. It includes image upload, batch detection, annotated output previews, model evaluation dashboards, and live API runtime metrics.
+A full-stack computer vision system that detects parking spaces from overhead lot images and classifies each space as **available** or **occupied** using a YOLOv8 oriented bounding box model. Includes a FastAPI inference backend, React dashboard, batch processing, model evaluation views, and live API runtime metrics.
 
 ---
 
-## Overview
+## Demo
 
-| Area | Details |
-| --- | --- |
-| Model | YOLOv8m-OBB |
-| Dataset | PKLot |
-| Backend | FastAPI inference API |
-| Frontend | React + Vite dashboard |
-| Current mAP50 | 99.48% |
-| Current mAP50-95 | 99.47% |
+| Detection Page | Batch Results |
+|---|---|
+| ![Detection Page](docs/screenshots/detection.png) | ![Batch Results](docs/screenshots/batch.png) |
+
+> Model: YOLOv8m-OBB · Dataset: PKLot · mAP50: **99.48%** · mAP50-95: **99.47%**
 
 ---
 
 ## Features
 
 - Upload JPEG, PNG, BMP, or WEBP parking-lot images
-- Detect rotated parking spaces with YOLOv8-OBB
-- Classify every detected space as available or occupied
-- View total spaces, available count, occupied count, occupancy percentage, and inference time
-- Display annotated output images with per-space overlays
-- Run batch detection across multiple images
-- Adjust confidence, IoU threshold, image size, and enhanced scan settings from the UI
-- Review model evaluation metrics, confusion matrix, per-class scores, and runtime API metrics
-- Keep detection results visible when switching between Detection and Evaluation pages
+- Detect rotated parking spaces via YOLOv8-OBB
+- Classify each space as available or occupied
+- View total spots, available, occupied, occupancy %, and inference time
+- Annotated output image with per-space overlays
+- Batch detection across multiple images
+- Model evaluation page with confusion matrix and per-class metrics
+- Live API runtime metrics (request count, avg inference time, last request)
+- Configurable confidence, IoU, image size, and enhanced tiled scan via sliders
 
 ---
 
 ## Model Performance
 
-Evaluation summary for the current checkpoint:
+Evaluated on **1,863 test images** from the PKLot dataset.
 
 | Metric | Score |
-| --- | --- |
+|---|---|
 | Precision | 99.90% |
 | Recall | 99.90% |
 | mAP50 | 99.48% |
 | mAP50-95 | 99.47% |
-| Test Images | 1,863 |
-| Instances | 107,508 |
 
 ---
 
 ## Tech Stack
 
 | Layer | Tools |
-| --- | --- |
-| Backend | Python, FastAPI, Uvicorn, Pydantic |
-| ML / Vision | Ultralytics YOLOv8-OBB, PyTorch, OpenCV, NumPy, Shapely |
+|---|---|
+| Backend | Python 3.10+, FastAPI, Uvicorn, Pydantic |
+| ML / Vision | YOLOv8-OBB (Ultralytics), PyTorch, OpenCV, NumPy, Shapely |
 | Frontend | React 18, Vite, Axios, Recharts, Tailwind CSS |
-| Training | Modal cloud GPU scripts |
+| Training | Modal (cloud GPU), PKLot dataset |
 
 ---
 
@@ -63,77 +58,51 @@ Evaluation summary for the current checkpoint:
 
 ```text
 .
-|-- backend/
-|   |-- api/
-|   |   `-- routes.py
-|   |-- core/
-|   |   `-- config.py
-|   |-- models/
-|   |   `-- schemas.py
-|   |-- services/
-|   |   `-- inference.py
-|   |-- utils/
-|   |   `-- image_utils.py
-|   `-- main.py
-|-- frontend/
-|   |-- src/
-|   |   |-- components/
-|   |   |-- pages/
-|   |   |-- services/
-|   |   |-- App.jsx
-|   |   |-- index.css
-|   |   `-- main.jsx
-|   |-- .env.example
-|   |-- package.json
-|   |-- package-lock.json
-|   `-- vite.config.js
-|-- models/
-|   `-- .gitkeep
-|-- training/
-|   |-- train_modal.py
-|   `-- test_modal.py
-|-- .env.example
-|-- .gitignore
-|-- README.md
-`-- requirements.txt
+├── backend/
+│   ├── api/
+│   │   └── routes.py          # FastAPI route definitions
+│   ├── core/
+│   │   └── config.py          # Environment-driven config (Pydantic Settings)
+│   ├── models/
+│   │   └── schemas.py         # Request/response Pydantic schemas
+│   ├── services/
+│   │   └── inference.py       # YOLOv8 inference + post-processing logic
+│   ├── utils/
+│   │   └── image_utils.py     # Image decode, encode, annotation helpers
+│   └── main.py                # App factory, lifespan, CORS
+├── frontend/
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/             # Detection, Evaluation, Metrics pages
+│   │   ├── services/          # Axios API client
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .env.example
+│   ├── package.json
+│   └── vite.config.js         # Dev proxy: /api → http://localhost:8000
+├── models/
+│   └── .gitkeep               # Placeholder — place best.pt here
+├── training/
+│   ├── train_modal.py         # Modal cloud training script
+│   └── test_modal.py          # Modal evaluation script
+├── .env.example
+├── requirements.txt
+└── README.md
 ```
-
----
-
-## Model Checkpoint
-
-The trained model checkpoint must be placed locally at:
-
-```text
-models/best.pt
-```
-
-The checkpoint is not committed to GitHub because it is a large binary file. GitHub blocks normal pushes of files over 100 MB, and this project ignores model checkpoint formats such as `.pt`, `.pth`, `.onnx`, and `.engine`.
-
-If `models/best.pt` is missing, the backend will still start, but prediction requests will return:
-
-```text
-503 Model not loaded
-```
-
-Recommended storage options for the checkpoint:
-
-- GitHub Release asset
-- Cloud storage such as S3, GCS, or Azure Blob
-- Git LFS if model versioning is required
 
 ---
 
 ## Requirements
 
 | Dependency | Version |
-| --- | --- |
-| Python | 3.10 or newer |
-| Node.js | 18 or newer |
-| npm | Bundled with Node.js |
-| Model file | `models/best.pt` |
+|---|---|
+| Python | 3.10+ |
+| Node.js | 18+ |
+| npm | bundled with Node |
+| CUDA (optional) | Any CUDA-capable GPU; falls back to CPU automatically |
 
-GPU is optional. With `DEVICE=auto`, the backend uses CUDA when available, MPS on supported Apple hardware, and CPU otherwise.
+The trained model checkpoint (`models/best.pt`) is **not committed** to this repository due to file size. See [Model Checkpoint](#model-checkpoint) below.
 
 ---
 
@@ -146,36 +115,45 @@ git clone https://github.com/BasuPatil09/Smart-Parking-System.git
 cd Smart-Parking-System
 ```
 
-### 2. Backend Setup
+### 2. Backend
 
 Create and activate a virtual environment:
 
 ```bash
+# Windows
 python -m venv venv
 venv\Scripts\activate
+
+# Linux / macOS
+python -m venv venv
+source venv/bin/activate
 ```
 
-Install backend dependencies:
+Install Python dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create a backend `.env` file:
+Configure environment:
 
 ```bash
+# Windows
 copy .env.example .env
+
+# Linux / macOS
+cp .env.example .env
 ```
 
-Backend environment variables:
+Backend environment variables (`.env`):
 
 ```env
 CHECKPOINT_PATH=models/best.pt
-DEVICE=auto
+DEVICE=auto                     # auto | cpu | cuda | mps
 ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 HOST=0.0.0.0
 PORT=8000
-EXPOSE_API_DOCS=true
+EXPOSE_API_DOCS=true            # Set false in production
 ```
 
 Start the backend:
@@ -184,92 +162,95 @@ Start the backend:
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Backend URLs:
-
-| Service | URL |
-| --- | --- |
+| Endpoint | URL |
+|---|---|
 | API | http://localhost:8000 |
 | Swagger UI | http://localhost:8000/docs |
 | Health Check | http://localhost:8000/health |
 
-Set `EXPOSE_API_DOCS=false` before deployment if public API docs should be disabled.
-
-### 3. Frontend Setup
-
-Install frontend dependencies:
+### 3. Frontend
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a frontend `.env` file:
+Configure environment:
 
 ```bash
+# Windows
 copy .env.example .env
+
+# Linux / macOS
+cp .env.example .env
 ```
 
-Frontend environment variables:
+Frontend environment variables (`frontend/.env`):
 
 ```env
 VITE_API_BASE_URL=/api
 ```
 
-Start the frontend:
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open:
+Open: **http://localhost:5173**
+
+> The Vite dev server proxies all `/api` requests to the backend at `http://localhost:8000`.
+
+---
+
+## Model Checkpoint
+
+The trained checkpoint is not stored in this repository (binary file, >100 MB). Place your `best.pt` file at:
 
 ```text
-http://localhost:5173
+models/best.pt
 ```
 
-The Vite dev server proxies `/api` requests to the backend at `http://localhost:8000`.
+The backend starts without it, but `POST /predict-image` returns `503 Model not loaded` until the file is present.
+
+**Storage options for the checkpoint:**
+
+- GitHub Release asset (recommended for open-source)
+- Cloud storage (S3, GCS, Azure Blob)
+- Git LFS (`git lfs track "*.pt"`)
+
+To train your own checkpoint from scratch, see [Training](#training).
 
 ---
 
 ## API Reference
 
 ### `GET /health`
-
 Returns backend liveness status.
 
 ### `GET /status`
-
 Returns model load status, active device, and server uptime.
 
 ### `GET /metrics`
-
-Returns runtime metrics such as request count, average inference time, and last request timestamp.
+Returns runtime metrics: request count, average inference time, last request timestamp.
 
 ### `GET /model-evaluation`
-
-Returns stored model evaluation metrics displayed on the Evaluation page.
+Returns stored evaluation metrics displayed on the Evaluation page.
 
 ### `POST /predict-image`
 
-Accepts a multipart image upload and returns occupancy predictions plus a base64-encoded annotated JPEG.
+Multipart form upload. Accepts JPEG, PNG, BMP, or WEBP.
 
 | Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `image` | file | required | Parking-lot image |
+|---|---|---|---|
+| `image` | file | — | Parking lot image (form field) |
 | `conf` | float | `0.15` | Detection confidence threshold |
 | `iou` | float | `0.55` | NMS IoU threshold |
-| `imgsz` | int | `1600` | YOLO inference image size |
+| `imgsz` | int | `1600` | YOLO inference image size (px) |
 | `max_det` | int | `1000` | Maximum detections returned |
-| `augment` | bool | `true` | Enhanced tiled scan for dense lots |
+| `augment` | bool | `true` | Enable enhanced tiled scan for dense lots |
 
-Example:
-
-```bash
-curl -X POST "http://localhost:8000/predict-image?conf=0.15&iou=0.55&imgsz=1600&max_det=1000&augment=true" ^
-  -F "image=@parking_lot.jpg"
-```
-
-Response fields:
+**Response fields:**
 
 ```json
 {
@@ -278,16 +259,41 @@ Response fields:
   "occupied": 26,
   "occupancy_pct": 92.9,
   "inference_ms": 573.6,
-  "spots": [],
-  "annotated_image_b64": "<base64-encoded-jpeg>"
+  "spots": [...],
+  "annotated_image_b64": "<base64-encoded PNG>"
 }
+```
+
+**Example (curl):**
+
+```bash
+curl -X POST "http://localhost:8000/predict-image?conf=0.15&iou=0.55&imgsz=1600&max_det=1000&augment=true" \
+  -F "image=@parking_lot.jpg"
 ```
 
 ---
 
-## Frontend Build
+## Training
 
-Build the production frontend:
+Training and evaluation scripts use [Modal](https://modal.com/) for cloud GPU execution against the [PKLot dataset](https://web.inf.ufpr.br/vri/databases/parking-lot-database/).
+
+**Run training:**
+
+```bash
+modal run training/train_modal.py
+```
+
+**Run test evaluation:**
+
+```bash
+modal run training/test_modal.py
+```
+
+The scripts train a YOLOv8m-OBB model and produce a `best.pt` checkpoint. Copy the output checkpoint to `models/best.pt` before starting the backend.
+
+---
+
+## Frontend Build (Production)
 
 ```bash
 cd frontend
@@ -300,122 +306,57 @@ Preview the production build locally:
 npm run preview
 ```
 
-The compiled output is written to:
+The compiled output is written to `frontend/dist/`. Serve it via a static host or configure FastAPI to mount it directly.
 
-```text
-frontend/dist/
-```
-
----
-
-## Training
-
-Training and test evaluation scripts are stored in:
-
-```text
-training/train_modal.py
-training/test_modal.py
-```
-
-Run training:
-
-```bash
-modal run training/train_modal.py
-```
-
-Run test evaluation:
-
-```bash
-modal run training/test_modal.py
-```
-
-After training, copy the generated checkpoint to:
-
-```text
-models/best.pt
-```
-
----
-
-## GitHub Notes
-
-The repository intentionally ignores generated files, local environments, datasets, logs, and model binaries.
-
-Ignored examples:
-
-```text
-venv/
-__pycache__/
-frontend/node_modules/
-frontend/dist/
-.env
-frontend/.env
-data/
-reports/
-logs/
-runs/
-*.pt
-*.pth
-*.onnx
-*.engine
-```
-
-Committed examples:
-
-```text
-.env.example
-frontend/.env.example
-requirements.txt
-frontend/package.json
-frontend/package-lock.json
-models/.gitkeep
-source code
-README.md
-```
-
-Do not commit real secrets, local `.env` files, datasets, generated outputs, or trained checkpoints.
+> Set `EXPOSE_API_DOCS=false` in `.env` before deploying the backend to production.
 
 ---
 
 ## Troubleshooting
 
-### `503 Model not loaded`
+**`503 Model not loaded`**
+The checkpoint is missing. Place `best.pt` at `models/best.pt` and restart the backend.
 
-Place the checkpoint at:
+**Frontend cannot reach backend**
+Confirm the backend is running on port `8000` and `VITE_API_BASE_URL=/api` is set in `frontend/.env`.
 
-```text
-models/best.pt
-```
-
-Then restart the backend.
-
-### Frontend cannot reach backend
-
-Make sure the backend is running on port `8000` and `frontend/.env` contains:
-
-```env
-VITE_API_BASE_URL=/api
-```
-
-### PowerShell blocks npm
-
-Use:
+**PowerShell blocks npm**
 
 ```powershell
 npm.cmd run dev
 npm.cmd run build
 ```
 
-### Large model file cannot be pushed
+**`best.pt` blocked by GitHub push (>100 MB)**
+Keep the file local. Use a GitHub Release asset, cloud storage, or Git LFS. Do not force-push large binaries.
 
-Keep `best.pt` local, upload it as a GitHub Release asset, store it in cloud storage, or use Git LFS.
+**Slow inference (CPU)**
+The status bar in the UI shows the active device. CPU inference on large images (1600px) typically takes 500–800 ms. Enable CUDA by ensuring PyTorch with CUDA support is installed and `DEVICE=auto` is set.
 
-### Slow inference on CPU
+---
 
-Large images can be slower on CPU. Use a CUDA-enabled PyTorch install and keep `DEVICE=auto` to run on GPU when available.
+## .gitignore Summary
+
+The following are excluded from version control:
+
+```text
+venv/               # Python virtualenv
+__pycache__/        # Python bytecode
+frontend/node_modules/
+frontend/dist/      # Frontend build output
+.env                # Local secrets
+frontend/.env
+data/               # Dataset files
+reports/ logs/ runs/
+*.pt *.pth *.onnx *.engine   # Model checkpoints
+```
+
+Committed files include `.env.example`, `requirements.txt`, `package.json`, `package-lock.json`, `models/.gitkeep`, and all source code.
 
 ---
 
 ## License
 
-Add a license before making this repository public.
+MIT License
+
+Copyright (c) [2026] [BASU PATIL]
