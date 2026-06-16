@@ -205,21 +205,47 @@ Open: **http://localhost:5173**
 
 ## Model Checkpoint
 
-The trained checkpoint is not stored in this repository (binary file, >100 MB). Place your `best.pt` file at:
+The trained checkpoint is not committed to this repository (137 MB binary). Download it from the [v1.0.0 Release](https://github.com/BasuPatil09/Smart-Parking-System/releases/tag/v1.0.0) and place it at `models/best.pt`.
 
-```text
-models/best.pt
+**Download `best.pt`:**
+
+```bash
+# Linux / macOS
+curl -L https://github.com/BasuPatil09/Smart-Parking-System/releases/download/v1.0.0/best.pt \
+  -o models/best.pt
+
+# Windows (PowerShell)
+Invoke-WebRequest -Uri https://github.com/BasuPatil09/Smart-Parking-System/releases/download/v1.0.0/best.pt `
+  -OutFile models\best.pt
 ```
 
 The backend starts without it, but `POST /predict-image` returns `503 Model not loaded` until the file is present.
 
-**Storage options for the checkpoint:**
-
-- GitHub Release asset (recommended for open-source)
-- Cloud storage (S3, GCS, Azure Blob)
-- Git LFS (`git lfs track "*.pt"`)
-
 To train your own checkpoint from scratch, see [Training](#training).
+
+---
+
+## Test Images
+
+The PKLot test set (1,863 images across UFPR04, UFPR05, and PUCPR lots) used for model evaluation is available as a release asset.
+
+**Download `Test-Images.zip` (550 MB):**
+
+```bash
+# Linux / macOS
+curl -L https://github.com/BasuPatil09/Smart-Parking-System/releases/download/v1.0.0/Test-Images.zip \
+  -o Test-Images.zip
+unzip Test-Images.zip -d data/test
+
+# Windows (PowerShell)
+Invoke-WebRequest -Uri https://github.com/BasuPatik09/Smart-Parking-System/releases/download/v1.0.0/Test-Images.zip `
+  -OutFile Test-Images.zip
+Expand-Archive -Path Test-Images.zip -DestinationPath data\test
+```
+
+Or download manually from the [v1.0.0 Release](https://github.com/BasuPatil09/Smart-Parking-System/releases/tag/v1.0.0).
+
+Use these images with the batch detection feature or to run `training/test_modal.py` for full evaluation.
 
 ---
 
@@ -327,8 +353,8 @@ npm.cmd run dev
 npm.cmd run build
 ```
 
-**`best.pt` blocked by GitHub push (>100 MB)**
-Keep the file local. Use a GitHub Release asset, cloud storage, or Git LFS. Do not force-push large binaries.
+**`best.pt` not found after cloning**
+Download it from the [v1.0.0 Release](https://github.com/BasuPatil09/Smart-Parking-System/releases/tag/v1.0.0) and place it at `models/best.pt`. The file is 137 MB and is not committed to the repository.
 
 **Slow inference (CPU)**
 The status bar in the UI shows the active device. CPU inference on large images (1600px) typically takes 500–800 ms. Enable CUDA by ensuring PyTorch with CUDA support is installed and `DEVICE=auto` is set.
@@ -357,6 +383,4 @@ Committed files include `.env.example`, `requirements.txt`, `package.json`, `pac
 
 ## License
 
-MIT License
-
-Copyright (c) [2026] [BASU PATIL]
+MIT License — Copyright (c) 2026 Basu Patil
